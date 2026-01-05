@@ -1,0 +1,614 @@
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Happy Birthday 💖</title>
+
+<style>
+:root{
+  --pink1:#ff4d88;
+  --pink2:#ff1a66;
+
+  /* lighter vibe (but still contrast-safe) */
+  --bg1:#f8e7f0;
+  --bg2:#eec6d7;
+  --bg3:#d99ab5;
+
+  /* end-ish ambience */
+  --endA: rgba(120,185,255,0.18);
+  --endB: rgba(120,185,255,0.08);
+  --endC: rgba(160,130,255,0.06);
+}
+
+*{ box-sizing:border-box; }
+
+body{
+  margin:0;
+  font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+  background: radial-gradient(circle at 50% 38%, var(--bg1) 0%, var(--bg2) 45%, var(--bg3) 100%);
+  overflow:hidden;
+}
+
+#game{
+  position:relative;
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
+}
+
+/* ================= BACKGROUND LAYER ================= */
+#bgLayer{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  overflow:hidden;
+}
+
+/* subtle stars */
+#bgLayer::before{
+  content:"";
+  position:absolute;
+  inset:-20%;
+  background:
+    radial-gradient(circle at 10% 20%, rgba(255,255,255,0.25) 0 1px, transparent 2px),
+    radial-gradient(circle at 35% 10%, rgba(255,255,255,0.18) 0 1px, transparent 2px),
+    radial-gradient(circle at 70% 25%, rgba(255,255,255,0.22) 0 1px, transparent 2px),
+    radial-gradient(circle at 85% 60%, rgba(255,255,255,0.14) 0 1px, transparent 2px),
+    radial-gradient(circle at 20% 75%, rgba(255,255,255,0.12) 0 1px, transparent 2px),
+    radial-gradient(circle at 55% 80%, rgba(255,255,255,0.12) 0 1px, transparent 2px);
+  opacity:0.35;
+  filter: blur(0.2px);
+  animation: starDrift 30s linear infinite;
+}
+
+@keyframes starDrift{
+  0% { transform: translate(0,0); }
+  100% { transform: translate(-3%,2%); }
+}
+
+/* subtle noise */
+#bgLayer::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  opacity:0.05;
+  mix-blend-mode: soft-light;
+}
+
+/* soft fog band */
+.fogband{
+  position:absolute;
+  inset:-20%;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(120,185,255,0.07), transparent 55%),
+    radial-gradient(circle at 70% 60%, rgba(160,130,255,0.06), transparent 55%),
+    radial-gradient(circle at 50% 80%, rgba(255,255,255,0.04), transparent 55%);
+  filter: blur(44px);
+  opacity:0.38;
+  mix-blend-mode: screen;
+  animation: fogMove 24s ease-in-out infinite;
+}
+
+@keyframes fogMove{
+  0%   { transform: translate(-2%, -1%) scale(1); }
+  50%  { transform: translate(2%,  1%) scale(1.05); }
+  100% { transform: translate(-2%, -1%) scale(1); }
+}
+
+/* ambient glow blobs */
+.ambient-glow{
+  position:absolute;
+  border-radius:50%;
+  pointer-events:none;
+  z-index:0;
+  background: radial-gradient(circle, var(--endA), var(--endB), transparent 72%);
+  filter: blur(75px);
+  opacity:0;
+  transform: scale(0.65);
+  mix-blend-mode: screen;
+  animation: glowGrow ease-in-out forwards;
+}
+
+@keyframes glowGrow{
+  0%   { transform: scale(0.65); opacity:0; }
+  25%  { opacity:0.20; }
+  70%  { opacity:0.12; }
+  100% { transform: scale(1.6); opacity:0; }
+}
+
+/* vignette for depth */
+#vignette{
+  position:absolute;
+  inset:-25%;
+  z-index:9;
+  pointer-events:none;
+  background: radial-gradient(circle at center,
+    rgba(255,255,255,0) 45%,
+    rgba(0,0,0,0.12) 100%);
+}
+
+/* ================= PLAYER ================= */
+.player{
+  position:absolute;
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  background: radial-gradient(circle, var(--pink1), var(--pink2));
+  box-shadow: 0 0 18px rgba(255, 80, 140, 0.65);
+  animation: pulse 2.8s ease-in-out infinite;
+  z-index:4;
+  will-change: left, top, transform;
+}
+
+@keyframes pulse{
+  0% { transform: scale(1); }
+  50%{ transform: scale(1.06); }
+  100%{ transform: scale(1); }
+}
+
+.halo{ box-shadow: 0 0 46px rgba(255,180,220,0.9); }
+
+/* ================= ORBS ================= */
+.orb{
+  position:absolute;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background: radial-gradient(circle, #fff, #ffd6e8);
+  box-shadow:
+    0 0 10px rgba(255,220,235,0.90),
+    0 0 26px rgba(255,120,170,0.45);
+  animation: float 2.2s ease-in-out infinite;
+  z-index:3;
+}
+
+@keyframes float{
+  0% { transform: translateY(0); }
+  50%{ transform: translateY(-6px); }
+  100%{ transform: translateY(0); }
+}
+
+/* pink aura */
+.orb::after{
+  content:"";
+  position:absolute;
+  inset:-12px;
+  border-radius:50%;
+  background: radial-gradient(
+    circle,
+    rgba(255,140,180,0.42),
+    rgba(255,140,180,0.16),
+    transparent 65%
+  );
+  filter: blur(6px);
+  opacity:0.85;
+  animation: orbAura 4.2s ease-in-out infinite;
+  pointer-events:none;
+}
+
+@keyframes orbAura{
+  0%   { transform: scale(0.96); opacity:0.55; }
+  50%  { transform: scale(1.18); opacity:0.95; }
+  100% { transform: scale(0.96); opacity:0.55; }
+}
+
+/* ================= PARTICLES ================= */
+.particle{
+  position:absolute;
+  width:5px;
+  height:5px;
+  border-radius:50%;
+  background: rgba(173, 216, 230, 0.85);
+  filter: blur(0.4px);
+  pointer-events:none;
+  z-index:2;
+  opacity:0.55;
+}
+
+/* ================= BUBBLES (MORE VISIBLE) ================= */
+.bubble{
+  position:absolute;
+  bottom:-80px;
+  border-radius:50%;
+  background:
+    radial-gradient(circle at 30% 30%,
+      rgba(255,255,255,0.90),
+      rgba(255,255,255,0.40),
+      rgba(255,255,255,0.12));
+  pointer-events:none;
+  z-index:1;
+  filter: blur(0.9px);
+  opacity:0.55;
+  animation: bubbleFloat linear forwards;
+}
+
+@keyframes bubbleFloat{
+  0%{
+    transform: translateY(0) translateX(0) scale(0.85);
+    opacity:0;
+  }
+  20%{ opacity:0.55; }
+  100%{
+    transform: translateY(-120vh) translateX(var(--drift)) scale(1.15);
+    opacity:0;
+  }
+}
+
+/* ================= MESSAGE BOX ================= */
+#messageBox{
+  position:fixed;
+  bottom:30px;
+  left:50%;
+  transform: translateX(-50%);
+  padding: 20px 28px;
+  font-size:18px;
+  letter-spacing:0.2px;
+  color:#333;
+  opacity:0;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  z-index:10;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    linear-gradient(135deg, #ffe1ef, #ffb7d6) border-box;
+  border:2px solid transparent;
+  border-radius:18px;
+  box-shadow:
+    0 10px 28px rgba(0,0,0,0.12),
+    inset 0 0 10px rgba(255,190,220,0.35);
+}
+
+#messageBox::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:18px;
+  background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.45) 45%, transparent 60%);
+  opacity:0;
+  transform: translateX(-40%);
+  pointer-events:none;
+}
+
+.msgOn{
+  transform: translateX(-50%) translateY(-2px);
+}
+
+.msgOn::after{
+  opacity:0.35;
+  animation: shimmer 1.6s ease-out 1;
+}
+
+@keyframes shimmer{
+  0%{ transform: translateX(-45%); opacity:0; }
+  20%{ opacity:0.35; }
+  100%{ transform: translateX(55%); opacity:0; }
+}
+
+/* ================= ONBOARDING & FINAL ================= */
+#onboarding{
+  position:fixed;
+  inset:0;
+  background: rgba(255,214,232,0.88);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  z-index:20;
+  text-align:center;
+  cursor:pointer;
+  user-select:none;
+}
+
+#final{
+  position:fixed;
+  inset:0;
+  background: rgba(255,214,232,0.85);
+  backdrop-filter: blur(6px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  z-index:20;
+  padding: 24px;
+}
+
+#final p{ max-width: 620px; line-height: 1.55; }
+
+#final button{
+  margin:10px;
+  padding:12px 24px;
+  border-radius:999px;
+  border:none;
+  background: linear-gradient(135deg, var(--pink1), var(--pink2));
+  color:white;
+  font-size:16px;
+  cursor:pointer;
+  box-shadow: 0 6px 18px rgba(255,26,102,0.35);
+  transition: transform .2s ease, opacity .2s ease;
+}
+
+#final button:hover{
+  transform: scale(1.05);
+  opacity:0.92;
+}
+</style>
+</head>
+
+<body>
+<div id="onboarding">
+  Move the heart ❤️<br>
+  Collect the glowing memories ✨<br><br>
+  <span style="font-size:14px;opacity:.8;">(Press any key or click to start)</span>
+</div>
+
+<div id="game">
+  <div id="bgLayer"><div class="fogband"></div></div>
+  <div class="player" id="player"></div>
+  <div id="vignette"></div>
+</div>
+
+<div id="messageBox"></div>
+
+<div id="final">
+  <div>
+    <h1>Happy Birthday 🎉</h1>
+    <p>
+      You’re not just a year older rn<br>
+      You entered another chapter of your life which would be even more beautiful!<br>
+      I’m genuinely grateful you exist 🫶<br>
+      Never forget U are such a beautiful soul
+    </p>
+    <button onclick="location.reload()">Relive ✨</button>
+    <button onclick="stay()">Just stay 🤍</button>
+  </div>
+</div>
+
+<script>
+  const player = document.getElementById("player");
+  const game = document.getElementById("game");
+  const bgLayer = document.getElementById("bgLayer");
+  const messageBox = document.getElementById("messageBox");
+  const onboarding = document.getElementById("onboarding");
+  const finalScreen = document.getElementById("final");
+
+  let x = 100, y = 100;
+  const speed = 6;
+
+  let lastMove = Date.now();
+  let started = false;
+
+  let collected = 0;
+  let messageQueue = [];
+  let showingMessage = false;
+
+  // MESSAGES MUST NOT CHANGE
+  const messages = [
+    "Hey you, travelling around making my each day more special :)",
+    "You make life warmer just by existing <3",
+    "I hope u grow even more than previous yearss!!!",
+    "You make everything more easy and light, N I hope u keep ur beautiful smile on ur face more often 🫶",
+    "One last thing >"
+  ];
+
+  // --- start helper (keyboard OR click) ---
+  function startGame(){
+    if (started) return;
+    started = true;
+    onboarding.remove();
+    // place player once
+    player.style.left = x + "px";
+    player.style.top = y + "px";
+  }
+  onboarding.addEventListener("click", startGame);
+
+  // --- orbs ---
+  const orbs = [];
+  function createOrb(){
+    const orb = document.createElement("div");
+    orb.className = "orb";
+    orb.style.left = Math.random() * (window.innerWidth - 60) + "px";
+    orb.style.top  = Math.random() * (window.innerHeight - 160) + "px";
+    game.appendChild(orb);
+    orbs.push(orb);
+  }
+  messages.forEach(createOrb);
+
+  // --- movement ---
+  document.addEventListener("keydown", (e) => {
+    if (!started) startGame();
+    lastMove = Date.now();
+
+    const key = e.key;
+    if (key === "ArrowUp" || key === "w" || key === "W") y -= speed;
+    if (key === "ArrowDown" || key === "s" || key === "S") y += speed;
+    if (key === "ArrowLeft" || key === "a" || key === "A") x -= speed;
+    if (key === "ArrowRight" || key === "d" || key === "D") x += speed;
+
+    x = Math.max(0, Math.min(window.innerWidth  - 40, x));
+    y = Math.max(0, Math.min(window.innerHeight - 40, y));
+
+    player.style.left = x + "px";
+    player.style.top  = y + "px";
+
+    checkCollision();
+  });
+
+  function checkCollision(){
+    orbs.forEach((orb, i) => {
+      if (!orb) return;
+      const o = orb.getBoundingClientRect();
+      const p = player.getBoundingClientRect();
+
+      if (
+        p.left < o.right &&
+        p.right > o.left &&
+        p.top < o.bottom &&
+        p.bottom > o.top
+      ) {
+        orb.remove();
+        orbs[i] = null;
+
+        enqueueMessage(messages[collected]);
+        collected++;
+
+        if (collected === messages.length) {
+          setTimeout(() => finalScreen.style.display = "flex", 1000);
+        }
+      }
+    });
+  }
+
+  // --- message queue (prevents overlap spam) ---
+  function enqueueMessage(text){
+    messageQueue.push(text);
+    if (!showingMessage) showNextMessage();
+  }
+
+  function showNextMessage(){
+    if (messageQueue.length === 0) return;
+    showingMessage = true;
+
+    messageBox.textContent = messageQueue.shift();
+    messageBox.style.opacity = 1;
+    messageBox.classList.add("msgOn");
+
+    setTimeout(() => {
+      messageBox.style.opacity = 0;
+      messageBox.classList.remove("msgOn");
+
+      setTimeout(() => {
+        showingMessage = false;
+        showNextMessage();
+      }, 600);
+    }, 2200);
+  }
+
+  // --- stillness halo ---
+  setInterval(() => {
+    if (!started) return;
+    if (Date.now() - lastMove > 5000) player.classList.add("halo");
+    else player.classList.remove("halo");
+  }, 500);
+
+  // --- guidance particles ---
+  const particles = [];
+  for (let i = 0; i < 12; i++) {
+    const p = document.createElement("div");
+    p.className = "particle";
+    p.x = x;
+    p.y = y;
+    p.angle = Math.random() * Math.PI * 2;
+    p.speed = 0.22 + Math.random() * 0.22;
+    game.appendChild(p);
+    particles.push(p);
+  }
+
+  function nearestOrb(px, py){
+    let min = Infinity, target = null;
+    orbs.forEach(o => {
+      if (!o) return;
+      const dx = o.offsetLeft - px;
+      const dy = o.offsetTop - py;
+      const d  = Math.hypot(dx, dy);
+      if (d < min) { min = d; target = o; }
+    });
+    return target;
+  }
+
+  function updateParticles(){
+    if (started) {
+      particles.forEach(p => {
+        const target = nearestOrb(x, y);
+        if (!target) return;
+
+        const dx = target.offsetLeft - p.x;
+        const dy = target.offsetTop  - p.y;
+        const dist = Math.hypot(dx, dy) || 1;
+
+        p.angle += 0.02;
+        p.x += (dx / dist) * p.speed + Math.sin(p.angle) * 0.28;
+        p.y += (dy / dist) * p.speed + Math.cos(p.angle) * 0.28;
+
+        if (dist < 50) { p.x = x; p.y = y; }
+
+        p.style.left = p.x + "px";
+        p.style.top  = p.y + "px";
+      });
+    }
+    requestAnimationFrame(updateParticles);
+  }
+  updateParticles();
+
+  // --- bubbles (more visible + more frequent) ---
+  setInterval(() => {
+    const b = document.createElement("div");
+    const size = 14 + Math.random() * 48;
+
+    b.className = "bubble";
+    b.style.width  = size + "px";
+    b.style.height = size + "px";
+    b.style.left = Math.random() * window.innerWidth + "px";
+    b.style.animationDuration = (18 + Math.random() * 18) + "s";
+    b.style.setProperty("--drift", (Math.random() * 80 - 40) + "px");
+
+    game.appendChild(b);
+    setTimeout(() => b.remove(), 45000);
+  }, 1200);
+
+  // --- ambient glows (avoid orbs + message zone so contrast stays clean) ---
+  function farFromOrbs(px, py){
+    for (const o of orbs) {
+      if (!o) continue;
+      const ox = o.offsetLeft + 15;
+      const oy = o.offsetTop  + 15;
+      if (Math.hypot(px - ox, py - oy) < 180) return false;
+    }
+    const mx = window.innerWidth / 2;
+    const my = window.innerHeight - 70;
+    if (Math.hypot(px - mx, py - my) < 200) return false;
+    return true;
+  }
+
+  setInterval(() => {
+    const g = document.createElement("div");
+    g.className = "ambient-glow";
+
+    const size = 260 + Math.random() * 320;
+    g.style.width  = size + "px";
+    g.style.height = size + "px";
+
+    let tries = 0, gx = 0, gy = 0;
+    do {
+      gx = Math.random() * window.innerWidth;
+      gy = Math.random() * window.innerHeight;
+      tries++;
+    } while (!farFromOrbs(gx, gy) && tries < 12);
+
+    g.style.left = gx + "px";
+    g.style.top  = gy + "px";
+    g.style.animationDuration = (18 + Math.random() * 16) + "s";
+
+    bgLayer.appendChild(g);
+    setTimeout(() => g.remove(), 38000);
+  }, 3500);
+
+  function stay(){
+    finalScreen.innerHTML = "<h1>🤍</h1><p>Password : 3942 dm in asguard</p>";
+  }
+
+  // initial placement (before start)
+  player.style.left = x + "px";
+  player.style.top  = y + "px";
+
+  // keep elements inside bounds on resize
+  window.addEventListener("resize", () => {
+    x = Math.max(0, Math.min(window.innerWidth  - 40, x));
+    y = Math.max(0, Math.min(window.innerHeight - 40, y));
+    player.style.left = x + "px";
+    player.style.top  = y + "px";
+  });
+</script>
+
+</body>
+</html>
